@@ -26,8 +26,11 @@ class DatabaseConnection:
         return self.cursor
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.conn.commit()
-        self.conn.close()
+        if exc_type or exc_val or exc_tb:
+            self.conn.close()
+        else:
+            self.conn.commit()
+            self.conn.close()
 
 
 @contextmanager
@@ -53,6 +56,9 @@ def database_connection(db_file: str):
 
     try:
         yield cursor
-    finally:
+    except Exception as e:
+        raise e
+    else:
         conn.commit()
+    finally:
         conn.close()
