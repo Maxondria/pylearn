@@ -1,5 +1,6 @@
 import sqlite3
 from contextlib import contextmanager
+from typing import Generator
 
 
 class DatabaseConnection:
@@ -20,12 +21,12 @@ class DatabaseConnection:
     def __init__(self, db_file: str):
         self.db_file = db_file
 
-    def __enter__(self):
+    def __enter__(self) -> sqlite3.Cursor:
         self.conn = sqlite3.connect(self.db_file)
         self.cursor = self.conn.cursor()
         return self.cursor
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         if exc_type or exc_val or exc_tb:
             self.conn.close()
         else:
@@ -34,7 +35,7 @@ class DatabaseConnection:
 
 
 @contextmanager
-def database_connection(db_file: str):
+def database_connection(db_file: str) -> Generator[sqlite3.Cursor, None, None]:
     """
     Context manager for SQLite database connection.
 
